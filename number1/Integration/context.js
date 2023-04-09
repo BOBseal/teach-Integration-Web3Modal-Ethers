@@ -1,9 +1,6 @@
 import React, {useState , useEffect  } from 'react';
+// main
 
-// The Chain Id and Config can be setup in vanilla but I will use Thirdweb React Library to make it easy af.
-//for non popular chains it needs the vanilla setup.
-
-import { ThirdwebProvider, ChainId } from '@thirdweb-dev/react';
 import { ethers } from 'ethers';
 import { connectingWithContract , connectWallet , CheckIfWalletConnected } from './helpers';
 
@@ -13,6 +10,7 @@ export const AppProvider = ({children})=> {
     const [account , setAccount] = useState("");
     const [provider, setProvider] = useState(null);
     const [Balance, setBalance] = useState("");
+    const [contract, setContract] = useState(null);
 
     const fetchData = async()=>{
         try {
@@ -26,7 +24,8 @@ export const AppProvider = ({children})=> {
             const getBal= await provider.getBalance(accounts[0]); // gets ether balance
             const balan = ethers.utils.formatEther(getBal); // special function to convert ether values into understandable format
             setBalance(balan); 
-            await connectingWithContract();   // connects to contract  
+            const contract = await connectingWithContract();   // connects to contract  
+            setContract(contract);
         } catch (error) {
             console.log(error);
         }
@@ -36,15 +35,32 @@ export const AppProvider = ({children})=> {
 
     useEffect(() => {
         fetchData();
-       }, [])
+       }, []);
 
+    const StoreStringNdUint =async({string , uintData})=>{  // data to send to the chain , data types or var does not need matching as smart contract but when passing it -
+        try {const contract = await connectingWithContract() ;  // -it is necessary to keep the order same as the smart contract
+        await contract.StoreString("Hello" , 100);//name must match contract function name // AS I SAID I AM BAD AT FRONT END I COULD NOT MAKE THE DATA PASS PROPERLY PLEASE DO TELL ME HOW TO FIX IT, JUST COMMIT
+        } catch(err){
+            console.log(err);
+        }
+    }
 
-       return(<ThirdwebProvider desiredChainId={ChainId.Mumbai}  // thirdweb has some default chains available, if you want to modify those please refer to Thirdweb's Docs
-        >
-        <AppContext.Provider value={{account , provider , Balance , connectWallet , CheckIfWalletConnected 
-        }}>
-            {children}
-        </AppContext.Provider >
-        </ThirdwebProvider>
+    const readString = async({address})=>{
+        try {
+            const contr = await connectingWithContract();
+            await contr.getStoredString(address); 
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    //try doing the read uint
+
+    return (
+    <AppContext.Provider value={{account , provider , Balance , connectWallet , CheckIfWalletConnected , StoreStringNdUint, readString , contract
+    }}>
+     {children}
+    </AppContext.Provider >
     )
 }

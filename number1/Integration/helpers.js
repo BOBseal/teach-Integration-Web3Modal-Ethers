@@ -1,11 +1,12 @@
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
-import ContractAbi from "./Constants/contract.json"
+import ContractJson from "./Constants/contract.json"
 
 // set up the helpers so that next can connect to the Blockchain.
 
+export const ContractAbi = ContractJson.abi;
 
-const ContractAddress = "0xE31FB1b4AA7458527d6b53461D84385e9b55FC91";
+const ContractAddress = "0xC954022ae4626c8221371CDd862564e52EB5EdeC";
 
 export const CheckIfWalletConnected = async()=> {
      try {
@@ -48,7 +49,7 @@ export const connectWallet = async()=> {
         }
     }  
 
-    export const convertTime = (time) => {  //converts Block.timestamp value to readable format
+    export const convertTime = (time) => {  //converts Block.timestamp fetched from blockchain value to readable format
         const newTime = new Date(time *1000);
     
         const realTime = newTime.toLocaleString();
